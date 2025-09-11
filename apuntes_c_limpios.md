@@ -15,6 +15,7 @@
 1. C inicia la ejecución en la función `main()`.
 2. Las variables deben declararse antes de usarse.
 3. Las instrucciones finalizan con punto y coma (`;`).
+4. En los strings c sabe que se terminó cuando hay un Null al final 
 
 ## Entrada con scanf
 ```c
@@ -166,10 +167,15 @@ foo -> bar == (*foo).bar
 - `*foo` accede al valor.
 - `&valor` da la dirección de memoria.
 
-
-
+```c
+int* p; // p es un puntero a un entero
+Node* n; // n es un puntero a un struct Node
+int x = 5;
+int* p = &x; // p guarda la dirección de x
+printf("d\n", *p) // accede al valor de x
 
 ## Punteros y funciones
+
 ```c
 void reiniciar(int *numero) {
     *numero = 0;
@@ -233,6 +239,15 @@ int main() {
 }
 ```
 
+```c
+int main(){
+    //ejemplo de querer pedir memoria
+    Gato* ,mi_gato = calloc(1, sizeof(Gato));
+    // si Gato tuviera un array con hijos gatitos 
+    mi_gato -> = Calloc(5,(sizeof(Gato)));
+}
+```
+
 ## Memoria dinámica con malloc
 - Malloc se utiliza para reservar espacio en la memoria 
 - Hay que revisar si el malloc fue exitoso
@@ -264,21 +279,33 @@ int main() {
 }
 ```
 ## Memoria 
-1. Stack : Sector asignado al programa, tiene espacio limitado.
+1. Stack : Sector asignado al programa, tiene espacio limitado
+    - Almacena variables locales y temporales
 2. Heap : No tiene estructura de asignación de espacios. Colección de bloques de memoria solicitados por el programa.
+    - Almacena estructuras dinámicas 
 #### Libreria <stdlib.h>
 - malloc : recibe c° de bytes a pedir al Heap y retorna un puntero. Inicializa con valores random.
 - calloc : Recibe la c° de elementos y su tamaño para pedir al Heap, retorna un puntero. Inicializa con 0 los valores
 - free : Para liberar los bloques utilizados del Heap.
+```c
+//Malloc//
+int a = 4 
+int* b = malloc(a*sizeof(int));
 
+//Calloc//
+int a2 = 4
+int* b2 = calloc(a2, sizeof(int));
+
+free(b);
+free(b2);
+```
+#### Ejemplo con heap 
 ```c
 typedef struct account{  // un struct llamado cuenta //
     int balance; // campo//
 
 } Account;
-/* Función que modifica el balance 
-- Account *account un puntero a una account  
-- int amount cuánto suma al balance */
+/* Función que modifica el balance  - Account *account un puntero a una account  - int amount cuánto suma al balance */
 void add_balance(Account *account, int amount){
     account -> balance += amount  // Accede al campo balance a través del puntero y le suma amount//
 } 
@@ -291,3 +318,115 @@ int main (){
 
 }
 ```
+## Listas ligadas 
+- Una estructura organizada en nodos
+- El nodo presente solo conoce el anterior y el siguiente 
+- Cada nodo es un struct 
+- Agregar elementos es asignar punteros, es más fácil que en un array
+- No se busca fácil los elementos como en array, porque se debe recorrer todo nodo. Se debe iterar en torno a la lista y luego actualizar el último valor.
+- Tiene complejidad de búsqueda O(n) y de inserción es O(1)!
+```c
+#include <stdio.h>
+typedef struct node {
+    // dos campos : value y next//
+    int value;  
+    struct node *next; // puntero al sgte nodo//
+} Node;
+ void print_linked_list(Node* head){ // recibe un puntero al primer nodo llamado head//
+    while (head != NULL){
+        printf("Value in node %d\n", head->value);
+    }
+ }
+ int main(){
+    //inicializar nodos (aún sin tener memoria)//
+    Node* one = NULL;
+    Node* two = NULL;
+    Node* three =NULL;
+    // Allocar memoria (memoria pedida al HEAP// 
+    one = calloc (1, sizeof(Node));
+    two = calloc (1, sizeof(Node));
+    three = calloc (1, sizeof(Node));
+
+    // Asignar valores a los espacios de memoria solicitados//
+    one -> value = 1;   // value es un campo int del struct Nodo/7
+    two -> value = 2;
+    three -> value = 3;
+
+    //Conectamos los nodos//
+    //Desde el nodo one, su campo next (puntero) apunta a la dirección de two//
+    one -> next = two; 
+    two -> next = three;
+    three -> next = NULL;
+
+    print_linked_list(one);
+
+    // Liberar memoria
+    free(one);
+    free(two);
+    free(three);
+    return 0
+ }
+ 
+ ```
+- "struct node *next" declara un puntero llamado next que apunta a otro nodo de la misma estructura (struct node)
+- (->) permite acceder a elementos de una estructura a través de un puntero
+
+## Matrices 
+- Es un array de arrays
+- Se pueden usar arrays para guardar punteros
+- Como los arrays son punteros, un arreglo de arrelgos, es un arreglo de punteros
+
+```c
+#include <stdio.h>
+int main(){
+    //método a) inicialización de matrices
+    int matrix[3][2] = {{1,1},{2,2},{3,3}};
+    // método b) inicialización de matriz por iteración
+    int* matrix[3]; // matrix[3] es un puntero a un entero
+        for (int i; i<3; i++){
+            int array[2] = {i + 1, i + 1};
+            matrix[i] = array;
+        };
+}
+```
+##
+int *A = malloc (3 * sizeof(int))
+A[0] = 1;
+....
+print( A, &A, &A[0])
+
+A = puntero
+A& = es un puntero de un puntero
+&A[0] = pido el puntero del primer elemento del arreglo
+A[0] = 1 
+
+## Relevante 
+- Cuando se tiene un struct, y se define un campo que no es puntero se hace con un . , no una flecha.
+- Las variables siempre están en stack. Pueden almacenar cualquier cosa pero siguen en stack.
+    - int number, int*number : ambas son variables pero la primera almacena un número en sí en el stack y otra almacena un puntero(dirección) en el stack.
+- Usar `calloc` para más claridad 
+
+
+## Errores comunes : Segmentation Fault
+- Referenciar un puntero con valor null
+- Usar punteros sin inicializarlos 
+- Recursión infinita -> Stack overflow (se utiliza más memoria de la solicitada o de la existente)
+- Acceder a índices fuera del límite del array
+- Acceder a espacios de memoria ya liberados
+- Liberar dos veces un espacio de memoria
+- Punteros a variables locales (se eliminan después de los usos) & retornar punteros a variables locales
+- Liberar punteros que nunca fueron del heap
+- Modificar strings de forma literal
+- 
+
+```
+int *psyduck = NULL;
+printf("%d", *psyduck);  
+
+
+int *psyduck;          
+printf("%d", *psyduck); 
+```
+
+## NOTA : Uso de valgrind como herramienta para debugging 
+## NOTA : Verificar los null para evitar Segmentation Faults 
