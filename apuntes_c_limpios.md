@@ -247,6 +247,11 @@ int main(){
     mi_gato -> = Calloc(5,(sizeof(Gato)));
 }
 ```
+- Nota : se puede crear un struct con la siguiente notación :
+```c
+struct struct_base struct_1 = {valor1, valor2, valor3....}
+```
+
 
 ## Memoria dinámica con malloc
 - Malloc se utiliza para reservar espacio en la memoria 
